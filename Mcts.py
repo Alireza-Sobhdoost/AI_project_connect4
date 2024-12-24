@@ -16,7 +16,7 @@ class TreeNode:
 
 
 class MCTS:
-    def __init__(self, iterations=15000, exploration_constant=2):
+    def __init__(self, iterations=17000, exploration_constant=2.25):
         self.iterations = iterations
         self.exploration_constant = exploration_constant
 
@@ -122,15 +122,15 @@ class MCTS:
                     # print("get here3")
                         
             elif count_ally == 3 :
-                player_score = 100
+                player_score = 400
             elif count_ally == 2 :
                 player_score = 10
             elif count_ally == 0 :
                 if count_enemy == 2 :
-                    player_score -= 150
+                    player_score -= 250
                     # print("get here2")
                 elif count_enemy == 3 :
-                    player_score -= 400
+                    player_score = 900
                     # print("get here3")
                         
                         
