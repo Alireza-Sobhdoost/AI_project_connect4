@@ -1,0 +1,52 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\title{AI Agent for Connect 4}
+\author{Arian Rahmatpour \\ Alireza Sobhdoost}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This document explains the algorithm used in the AI agent to play the game of Connect 4, the heuristic function, and the results of some experiments conducted to evaluate the performance of the AI agent.
+
+\section{Algorithm}
+The AI agent uses the Minimax algorithm with alpha-beta pruning to decide the best move. The Minimax algorithm is a recursive algorithm used for decision-making in game theory. It provides an optimal move for the player assuming that the opponent is also playing optimally.
+
+\subsection{Minimax Algorithm}
+The Minimax algorithm works by simulating all possible moves in the game up to a certain depth and then evaluating the game state at the leaf nodes using a heuristic function. The algorithm alternates between maximizing the AI's score and minimizing the opponent's score. Alpha-beta pruning is used to eliminate branches in the game tree that do not need to be explored because they cannot influence the final decision.
+
+\subsection{Heuristic Function}
+The heuristic function evaluates the game state and assigns a score based on the potential for winning. The function considers several factors:
+\begin{itemize}
+    \item Center column control: The center column is given higher weight because it provides more opportunities for connecting four pieces.
+    \item Horizontal, vertical, and diagonal connections: The function evaluates potential connections of 2, 3, and 4 pieces in all directions.
+    \item Blocking opponent's moves: The function also considers the opponent's potential moves and assigns negative scores to positions that could lead to the opponent's win.
+\end{itemize}
+
+\section{Experiments}
+We conducted several experiments to evaluate the performance of the AI agent by varying the depth of the Minimax algorithm.
+
+\subsection{Depth Analysis}
+\begin{itemize}
+    \item \textbf{Depth 3 and bellow}: The AI agent performed poorly, often making suboptimal moves and missing obvious winning opportunities.
+    \item \textbf{Depth 5}: The AI agent showed significant improvement, making more strategic moves and blocking the opponent effectively.
+    \item \textbf{Depth 6}: The AI agent performed well, balancing between offensive and defensive strategies.
+    \item \textbf{Depth 7 and above}: The AI agent became overly cautious, focusing too much on not losing rather than winning. This resulted in missed winning opportunities.
+\end{itemize}
+
+\section{Conclusion}
+The experiments indicate that the optimal depth for the Minimax algorithm lies between 4 and 7. Increasing the depth beyond this range makes the AI agent overly cautious, while decreasing it makes the agent less strategic.
+
+\section{Future Work}
+To improve the AI agent, we suggest the following:
+\begin{itemize}
+    \item Implementing a more sophisticated heuristic function that better balances offensive and defensive strategies.
+    \item Using machine learning techniques to dynamically adjust the depth based on the game state.
+    \item Incorporating Monte Carlo Tree Search (MCTS) to explore more potential moves and outcomes.
+\end{itemize}
+
+\end{document}
