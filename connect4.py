@@ -1,81 +1,73 @@
 import numpy as np
 import pygame
 
+BLUE = (0, 0, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+YELLOW = (255, 255, 0)
 
-class Connect4:
-    BLUE = (0,0,255)
-    BLACK = (0,0,0)
-    RED = (255,0,0)
-    YELLOW = (255,255,0)
+ROW_COUNT = 6
+COLUMN_COUNT = 7
 
-    ROW_COUNT = 6
-    COLUMN_COUNT = 7
+SQUARESIZE = 100
 
-    PLAYER = 0
-    AI = 1
+width = COLUMN_COUNT * SQUARESIZE
+height = (ROW_COUNT + 1) * SQUARESIZE
+size = (width, height)
+RADIUS = int(SQUARESIZE / 2 - 5)
 
-    SQUARESIZE = 100
+def create_board():
+    return np.zeros((ROW_COUNT, COLUMN_COUNT))
 
-    width = COLUMN_COUNT * SQUARESIZE
-    height = (ROW_COUNT+1) * SQUARESIZE
-    size = (width, height)
-    RADIUS = int(SQUARESIZE/2 - 5)
+def drop_piece(board, row, col, piece):
+    board[row][col] = piece
 
-    def __init__(self):
-        self.board = self.create_board()
+def is_valid_location(board, col):
+    return board[ROW_COUNT - 1][col] == 0
 
-    def create_board(self):
-        return np.zeros((self.ROW_COUNT, self.COLUMN_COUNT))
+def get_next_open_row(board, col):
+    for r in range(ROW_COUNT):
+        if board[r][col] == 0:
+            return r
 
-    def drop_piece(self, row, col, piece):
-        self.board[row][col] = piece
+def print_board(board):
+    print(np.flip(board, 0))
 
-    def is_valid_location(self, col):
-        return self.board[self.ROW_COUNT-1][col] == 0
+def winning_move(board, piece):
+    # Check horizontal locations for win
+    for c in range(COLUMN_COUNT - 3):
+        for r in range(ROW_COUNT):
+            if board[r][c] == piece and board[r][c + 1] == piece and board[r][c + 2] == piece and board[r][c + 3] == piece:
+                return True
 
-    def get_next_open_row(self, col):
-        for r in range(self.ROW_COUNT):
-            if self.board[r][col] == 0:
-                return r
+    # Check vertical locations for win
+    for c in range(COLUMN_COUNT):
+        for r in range(ROW_COUNT - 3):
+            if board[r][c] == piece and board[r + 1][c] == piece and board[r + 2][c] == piece and board[r + 3][c] == piece:
+                return True
 
-    def print_board(self):
-        print(np.flip(self.board, 0))
+    # Check positively sloped diagonals
+    for c in range(COLUMN_COUNT - 3):
+        for r in range(ROW_COUNT - 3):
+            if board[r][c] == piece and board[r + 1][c + 1] == piece and board[r + 2][c + 2] == piece and board[r + 3][c + 3] == piece:
+                return True
 
-    def winning_move(self, piece):
-        # Check horizontal locations for win
-        for c in range(self.COLUMN_COUNT-3):
-            for r in range(self.ROW_COUNT):
-                if self.board[r][c] == piece and self.board[r][c+1] == piece and self.board[r][c+2] == piece and self.board[r][c+3] == piece:
-                    return True
+    # Check negatively sloped diagonals
+    for c in range(COLUMN_COUNT - 3):
+        for r in range(3, ROW_COUNT):
+            if board[r][c] == piece and board[r - 1][c + 1] == piece and board[r - 2][c + 2] == piece and board[r - 3][c + 3] == piece:
+                return True
 
-        # Check vertical locations for win
-        for c in range(self.COLUMN_COUNT):
-            for r in range(self.ROW_COUNT-3):
-                if self.board[r][c] == piece and self.board[r+1][c] == piece and self.board[r+2][c] == piece and self.board[r+3][c] == piece:
-                    return True
-
-        # Check positively sloped diagonals
-        for c in range(self.COLUMN_COUNT-3):
-            for r in range(self.ROW_COUNT-3):
-                if self.board[r][c] == piece and self.board[r+1][c+1] == piece and self.board[r+2][c+2] == piece and self.board[r+3][c+3] == piece:
-                    return True
-
-        # Check negatively sloped diagonals
-        for c in range(self.COLUMN_COUNT-3):
-            for r in range(3, self.ROW_COUNT):
-                if self.board[r][c] == piece and self.board[r-1][c+1] == piece and self.board[r-2][c+2] == piece and self.board[r-3][c+3] == piece:
-                    return True
-
-    def draw_board(self, screen):
-        for c in range(self.COLUMN_COUNT):
-            for r in range(self.ROW_COUNT):
-                pygame.draw.rect(screen, self.BLUE, (c*self.SQUARESIZE, r*self.SQUARESIZE+self.SQUARESIZE, self.SQUARESIZE, self.SQUARESIZE))
-                pygame.draw.circle(screen, self.BLACK, (int(c*self.SQUARESIZE+self.SQUARESIZE/2), int(r*self.SQUARESIZE+self.SQUARESIZE+self.SQUARESIZE/2)), self.RADIUS)
-        
-        for c in range(self.COLUMN_COUNT):
-            for r in range(self.ROW_COUNT):        
-                if self.board[r][c] == 1:
-                    pygame.draw.circle(screen, self.RED, (int(c*self.SQUARESIZE+self.SQUARESIZE/2), self.height-int(r*self.SQUARESIZE+self.SQUARESIZE/2)), self.RADIUS)
-                elif self.board[r][c] == 2: 
-                    pygame.draw.circle(screen, self.YELLOW, (int(c*self.SQUARESIZE+self.SQUARESIZE/2), self.height-int(r*self.SQUARESIZE+self.SQUARESIZE/2)), self.RADIUS)
-        pygame.display.update()
+def draw_board(board, screen):
+    for c in range(COLUMN_COUNT):
+        for r in range(ROW_COUNT):
+            pygame.draw.rect(screen, BLUE, (c * SQUARESIZE, r * SQUARESIZE + SQUARESIZE, SQUARESIZE, SQUARESIZE))
+            pygame.draw.circle(screen, BLACK, (int(c * SQUARESIZE + SQUARESIZE / 2), int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+    
+    for c in range(COLUMN_COUNT):
+        for r in range(ROW_COUNT):
+            if board[r][c] == 1:
+                pygame.draw.circle(screen, RED, (int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+            elif board[r][c] == 2:
+                pygame.draw.circle(screen, YELLOW, (int(c * SQUARESIZE + SQUARESIZE / 2), height - int(r * SQUARESIZE + SQUARESIZE / 2)), RADIUS)
+    pygame.display.update()

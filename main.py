@@ -3,21 +3,40 @@ import pygame
 import sys
 import math
 from min_max import get_ai_move
-from connect4 import Connect4
+from connect4 import (
+    create_board,
+    drop_piece,
+    is_valid_location,
+    get_next_open_row,
+    print_board,
+    winning_move,
+    draw_board,
+    RED,
+    YELLOW,
+    BLACK,
+    SQUARESIZE,
+    width,
+    size,
+    RADIUS
+)
 
+
+PLAYER = 0
+AI = 1
 
 if __name__ == '__main__':
-    game = Connect4()
+    board = create_board()
+    print_board(board)
     game_over = False
-    turn = game.PLAYER
+    turn = PLAYER
 
     pygame.init()
 
-    screen = pygame.display.set_mode(game.size)
-    game.draw_board(screen)
+    screen = pygame.display.set_mode(size)
+    draw_board(board, screen)
     pygame.display.update()
 
-    my_font = pygame.font.SysFont("monospace", 75)
+    myfont = pygame.font.SysFont("monospace", 75)
 
     while not game_over:
 
@@ -26,48 +45,48 @@ if __name__ == '__main__':
                 sys.exit()
 
             if event.type == pygame.MOUSEMOTION:
-                pygame.draw.rect(screen, game.BLACK, (0, 0, game.width, game.SQUARESIZE))
+                pygame.draw.rect(screen, BLACK, (0,0, width, SQUARESIZE))
                 posx = event.pos[0]
-                if turn == game.PLAYER:
-                    pygame.draw.circle(screen, game.RED, (posx, int(game.SQUARESIZE / 2)), game.RADIUS)
+                if turn == PLAYER:
+                    pygame.draw.circle(screen, RED, (posx, int(SQUARESIZE/2)), RADIUS)
             pygame.display.update()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pygame.draw.rect(screen, game.BLACK, (0, 0, game.width, game.SQUARESIZE))
-                if turn == game.PLAYER:
+                pygame.draw.rect(screen, BLACK, (0,0, width, SQUARESIZE))
+                if turn == PLAYER:
                     posx = event.pos[0]
-                    col = int(math.floor(posx / game.SQUARESIZE))
+                    col = int(math.floor(posx/SQUARESIZE))
 
-                    if game.is_valid_location(col):
-                        row = game.get_next_open_row(col)
-                        game.drop_piece(row, col, 1)
+                    if is_valid_location(board, col):
+                        row = get_next_open_row(board, col)
+                        drop_piece(board, row, col, 1)
 
-                        if game.winning_move(1):
-                            label = my_font.render("Player 1 wins!!", 1, game.RED)
-                            screen.blit(label, (40, 10))
+                        if winning_move(board, 1):
+                            label = myfont.render("Player 1 wins!!", 1, RED)
+                            screen.blit(label, (40,10))
                             game_over = True
 
-                        turn = game.AI
-                        game.print_board()
-                        game.draw_board(screen)
+                        turn = AI
+                        print_board(board)
+                        draw_board(board, screen)
 
-        if turn == game.AI and not game_over:
-            col = get_ai_move(game.board)
+        if turn == AI and not game_over:
+            col = get_ai_move(board)
 
-            if game.is_valid_location(col):
+            if is_valid_location(board, col):
                 pygame.time.wait(500)
-                row = game.get_next_open_row(col)
-                game.drop_piece(row, col, 2)
+                row = get_next_open_row(board, col)
+                drop_piece(board, row, col, 2)
 
-                if game.winning_move(2):
-                    label = my_font.render("AI wins!!", 1, game.YELLOW)
-                    screen.blit(label, (40, 10))
+                if winning_move(board, 2):
+                    label = myfont.render("AI wins!!", 1, YELLOW)
+                    screen.blit(label, (40,10))
                     game_over = True
 
-                game.print_board()
-                game.draw_board(screen)
+                print_board(board)
+                draw_board(board, screen)
 
-                turn = game.PLAYER
+                turn = PLAYER
 
         if game_over:
             pygame.time.wait(3000)

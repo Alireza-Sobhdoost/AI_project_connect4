@@ -1,44 +1,42 @@
 import numpy as np
-from connect4 import Connect4
+from connect4 import ROW_COUNT, COLUMN_COUNT, drop_piece, is_valid_location, get_next_open_row, winning_move
 
 PLAYER_PIECE = 1
 AI_PIECE = 2
 EMPTY = 0
 WINDOW_LENGTH = 4
 
-connect4 = Connect4()
-
 def score_position(board, piece):
     score = 0
 
     # Score center column
-    center_array = [int(i) for i in list(board[:, connect4.COLUMN_COUNT//2])]
+    center_array = [int(i) for i in list(board[:, COLUMN_COUNT//2])]
     center_count = center_array.count(piece)
     score += center_count * 3
 
     # Score Horizontal
-    for r in range(connect4.ROW_COUNT):
+    for r in range(ROW_COUNT):
         row_array = [int(i) for i in list(board[r,:])]
-        for c in range(connect4.COLUMN_COUNT-3):
+        for c in range(COLUMN_COUNT-3):
             window = row_array[c:c+WINDOW_LENGTH]
             score += evaluate_window(window, piece)
 
     # Score Vertical
-    for c in range(connect4.COLUMN_COUNT):
+    for c in range(COLUMN_COUNT):
         col_array = [int(i) for i in list(board[:,c])]
-        for r in range(connect4.ROW_COUNT-3):
+        for r in range(ROW_COUNT-3):
             window = col_array[r:r+WINDOW_LENGTH]
             score += evaluate_window(window, piece)
 
     # Score positive sloped diagonal
-    for r in range(connect4.ROW_COUNT-3):
-        for c in range(connect4.COLUMN_COUNT-3):
+    for r in range(ROW_COUNT-3):
+        for c in range(COLUMN_COUNT-3):
             window = [board[r+i][c+i] for i in range(WINDOW_LENGTH)]
             score += evaluate_window(window, piece)
 
     # Score negative sloped diagonal
-    for r in range(connect4.ROW_COUNT-3):
-        for c in range(connect4.COLUMN_COUNT-3):
+    for r in range(ROW_COUNT-3):
+        for c in range(COLUMN_COUNT-3):
             window = [board[r+3-i][c+i] for i in range(WINDOW_LENGTH)]
             score += evaluate_window(window, piece)
 
@@ -63,16 +61,16 @@ def evaluate_window(window, piece):
     return score
 
 def is_terminal_node(board):
-    return connect4.winning_move(PLAYER_PIECE) or connect4.winning_move(AI_PIECE) or len(get_valid_locations(board)) == 0
+    return winning_move(board, PLAYER_PIECE) or winning_move(board, AI_PIECE) or len(get_valid_locations(board)) == 0
 
 def minimax(board, depth, alpha, beta, maximizingPlayer):
     valid_locations = get_valid_locations(board)
     is_terminal = is_terminal_node(board)
     if depth == 0 or is_terminal:
         if is_terminal:
-            if connect4.winning_move(AI_PIECE):
+            if winning_move(board, AI_PIECE):
                 return (None, 100000000000000)
-            elif connect4.winning_move(PLAYER_PIECE):
+            elif winning_move(board, PLAYER_PIECE):
                 return (None, -10000000000000)
             else: # Game is over, no more valid moves
                 return (None, 0)
@@ -82,9 +80,9 @@ def minimax(board, depth, alpha, beta, maximizingPlayer):
         value = -np.inf
         column = np.random.choice(valid_locations)
         for col in valid_locations:
-            row = connect4.get_next_open_row(col)
+            row = get_next_open_row(board, col)
             b_copy = board.copy()
-            connect4.drop_piece(row, col, AI_PIECE)
+            drop_piece(b_copy, row, col, AI_PIECE)
             new_score = minimax(b_copy, depth-1, alpha, beta, False)[1]
             if new_score > value:
                 value = new_score
@@ -98,9 +96,9 @@ def minimax(board, depth, alpha, beta, maximizingPlayer):
         value = np.inf
         column = np.random.choice(valid_locations)
         for col in valid_locations:
-            row = connect4.get_next_open_row(col)
+            row = get_next_open_row(board, col)
             b_copy = board.copy()
-            connect4.drop_piece(row, col, PLAYER_PIECE)
+            drop_piece(b_copy, row, col, PLAYER_PIECE)
             new_score = minimax(b_copy, depth-1, alpha, beta, True)[1]
             if new_score < value:
                 value = new_score
@@ -112,8 +110,8 @@ def minimax(board, depth, alpha, beta, maximizingPlayer):
 
 def get_valid_locations(board):
     valid_locations = []
-    for col in range(connect4.COLUMN_COUNT):
-        if connect4.is_valid_location(col):
+    for col in range(COLUMN_COUNT):
+        if is_valid_location(board, col):
             valid_locations.append(col)
     return valid_locations
 
@@ -122,9 +120,9 @@ def pick_best_move(board, piece):
     best_score = -10000
     best_col = np.random.choice(valid_locations)
     for col in valid_locations:
-        row = connect4.get_next_open_row(col)
+        row = get_next_open_row(board, col)
         temp_board = board.copy()
-        connect4.drop_piece(row, col, piece)
+        drop_piece(temp_board, row, col, piece)
         score = score_position(temp_board, piece)
         if score > best_score:
             best_score = score
