@@ -1,4 +1,3 @@
-import numpy as np
 import pygame
 import sys
 import math
@@ -71,7 +70,7 @@ if __name__ == '__main__':
                         draw_board(board, screen)
 
         if turn == AI and not game_over:
-            col = get_ai_move(board)
+            col = get_ai_move(board, 5)
 
             if is_valid_location(board, col):
                 pygame.time.wait(500)

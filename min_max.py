@@ -130,6 +130,6 @@ def pick_best_move(board, piece):
 
     return best_col
 
-def get_ai_move(board):
-    col, minimax_score = minimax(board, 5, -np.inf, np.inf, True)
+def get_ai_move(board, depth):
+    col, minimax_score = minimax(board, depth, -np.inf, np.inf, True)
     return col
