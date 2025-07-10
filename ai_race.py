@@ -11,11 +11,7 @@ from connect4 import (
     draw_board,
     RED,
     YELLOW,
-    BLACK,
-    SQUARESIZE,
-    width,
     size,
-    RADIUS
 )
 
 AI1 = 0
